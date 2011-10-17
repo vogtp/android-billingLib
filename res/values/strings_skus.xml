@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+       <!-- The following are reserved skus defined by Market for testing. -->
+    <string name="android_test_canceled">android.test.canceled</string>
+    <string name="android_test_purchased">android.test.purchased</string>
+    <string name="android_test_item_unavailable">android.test.item unavailable</string>
+    <string name="android_test_refunded">android.test.refunded</string>
+</resources>

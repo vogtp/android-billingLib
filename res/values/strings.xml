@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="prod_beer">Beer</string>
+    <string name="prod_sixpack_beer">A sixpack beer</string>
+    <string name="prod_drinks">Drinks...</string>
+</resources>

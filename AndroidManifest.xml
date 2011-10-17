@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      android:versionName="1.1" android:versionCode="2" package="ch.almana.android.billing">
+    <uses-sdk android:minSdkVersion="4"/>
+    <uses-permission android:name="com.android.vending.BILLING"></uses-permission>
+
+    <application>
+<service android:name="ch.almana.android.billing.backend.BillingService"/>
+
+    <receiver android:name="ch.almana.android.billing.backend.BillingReceiver">
+      <intent-filter>
+        <action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+        <action android:name="com.android.vending.billing.RESPONSE_CODE" />
+        <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+      </intent-filter>
+    </receiver>
+
+    </application>
+</manifest>
