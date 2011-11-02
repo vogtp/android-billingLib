@@ -73,8 +73,8 @@ public class BillingManager {
 		ResponseHandler.register(purchaseObserver);
 	}
 
-	public boolean checkBillingSupported() {
-		return mBillingService.checkBillingSupported();
+	private void checkBillingSupported() {
+		mBillingService.checkBillingSupported();
 	}
 
 	public boolean requestPurchase(String mSku) {
