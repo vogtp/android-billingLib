@@ -37,7 +37,8 @@ public class BillingManager {
 		mBillingService.setContext(act.getApplicationContext());
 
 		productCache = new ProductCache(act.getApplicationContext());
-		productCache.restoreDatabase(mBillingService);
+		productCache.restoreDatabase(mBillingService, false);
+		checkBillingSupported();
 		registerReceiver();
 	}
 
@@ -53,8 +54,8 @@ public class BillingManager {
 		super.finalize();
 	}
 
-	public void reinitalise() {
-		productCache.initializeOwnedItems();
+	public void restoreTransactionsFromMarket() {
+		productCache.restoreDatabase(mBillingService, true);
 	}
 
 	public int getCountOfProduct(String pid) {

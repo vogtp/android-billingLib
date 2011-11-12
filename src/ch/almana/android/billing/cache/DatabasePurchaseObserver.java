@@ -21,6 +21,7 @@ public class DatabasePurchaseObserver extends PurchaseObserver {
 
 	@Override
 	public void onPurchaseStateChange(PurchaseState purchaseState, String itemId, long purchaseTime, String developerPayload) {
+		Log.i(TAG, "Product " + itemId + " has a purchase state of " + purchaseState);
 		if (purchaseState == PurchaseState.PURCHASED) {
 			productCache.purchasedItem(itemId, purchaseState, purchaseTime, developerPayload);
 		}
@@ -54,6 +55,12 @@ public class DatabasePurchaseObserver extends PurchaseObserver {
 				Log.d(TAG, "RestoreTransactions error: " + responseCode);
 			}
 		}
+	}
+
+	@Override
+	public void onBillingSupported(boolean supported) {
+		super.onBillingSupported(supported);
+		productCache.fireBillingSupported(supported);
 	}
 
 }

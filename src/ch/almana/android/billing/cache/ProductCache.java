@@ -41,9 +41,9 @@ public class ProductCache {
 	 * 
 	 * @param mBillingService
 	 */
-	public void restoreDatabase(BillingService billingService) {
+	public void restoreDatabase(BillingService billingService, boolean force) {
 		boolean initialized = getPreferences().getBoolean(DB_INITIALIZED, false);
-		if (!initialized) {
+		if (force || !initialized) {
 			billingService.restoreTransactions();
 			//debug: Toast.makeText(ctx, R.string.restoring_transactions, Toast.LENGTH_LONG).show();
 		}
@@ -102,5 +102,11 @@ public class ProductCache {
 
 	public void removePurchaseListener(PurchaseListener listener) {
 		purchaseListeners.remove(listener);
+	}
+
+	public void fireBillingSupported(boolean supported) {
+		for (PurchaseListener listener : purchaseListeners) {
+			listener.billingSupported(supported);
+		}
 	}
 }
