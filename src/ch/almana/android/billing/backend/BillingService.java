@@ -366,6 +366,10 @@ public class BillingService extends Service implements ServiceConnection {
      * @param startId an identifier for the invocation instance of this service
      */
     public void handleCommand(Intent intent, int startId) {
+		if (intent == null) {
+			Log.e(TAG, "BillingService.handleCommand got null intent, returning");
+			return;
+		}
         String action = intent.getAction();
         if (Consts.DEBUG) {
             Log.i(TAG, "handleCommand() action: " + action);
@@ -571,7 +575,8 @@ public class BillingService extends Service implements ServiceConnection {
      * This is called when we are connected to the MarketBillingService.
      * This runs in the main UI thread.
      */
-    public void onServiceConnected(ComponentName name, IBinder service) {
+    @Override
+	public void onServiceConnected(ComponentName name, IBinder service) {
         if (Consts.DEBUG) {
             Log.d(TAG, "Billing service connected");
         }
@@ -582,7 +587,8 @@ public class BillingService extends Service implements ServiceConnection {
     /**
      * This is called when we are disconnected from the MarketBillingService.
      */
-    public void onServiceDisconnected(ComponentName name) {
+    @Override
+	public void onServiceDisconnected(ComponentName name) {
         Log.w(TAG, "Billing service disconnected");
         mService = null;
     }
