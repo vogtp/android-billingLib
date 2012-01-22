@@ -221,6 +221,9 @@ public class BillingService extends Service implements ServiceConnection {
 
         @Override
         protected long run() throws RemoteException {
+			if (mService == null) {
+				return Consts.BILLING_RESPONSE_INVALID_REQUEST_ID;
+			}
             Bundle request = makeRequestBundle("REQUEST_PURCHASE");
             request.putString(Consts.BILLING_REQUEST_ITEM_ID, mProductId);
             // Note that the developer payload is optional.
