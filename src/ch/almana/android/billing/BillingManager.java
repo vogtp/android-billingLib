@@ -3,9 +3,6 @@ package ch.almana.android.billing;
 import java.util.Map;
 
 import android.app.Activity;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Handler;
 import android.widget.Toast;
 import ch.almana.android.billing.backend.BillingService;
@@ -14,6 +11,7 @@ import ch.almana.android.billing.backend.PurchaseObserver;
 import ch.almana.android.billing.backend.ResponseHandler;
 import ch.almana.android.billing.cache.DatabasePurchaseObserver;
 import ch.almana.android.billing.cache.ProductCache;
+import ch.almana.android.logdebug.Debug;
 
 public class BillingManager {
 
@@ -22,7 +20,6 @@ public class BillingManager {
 		MANAGED, UNMANAGED
 	}
 
-	private static final int DEBUG_SIGNATURE_HASH = -1623526495;
 	private final BillingService mBillingService;
 	private final ProductCache productCache;
 	private final Handler mHandler;
@@ -79,26 +76,13 @@ public class BillingManager {
 	}
 
 	public boolean requestPurchase(String mSku) {
-		if (isDebugPackage()) {
+		if (Debug.isUnsinedPackage(act)) {
 			productCache.setInitalised();
 			productCache.purchasedItem(mSku, PurchaseState.PURCHASED, System.currentTimeMillis(), "");
 			Toast.makeText(act, "Dummy purchase!", Toast.LENGTH_LONG).show();
 			return true;
 		}
 		return mBillingService.requestPurchase(mSku, null);
-	}
-
-	private boolean isDebugPackage() {
-		String packageName = act.getApplication().getPackageName();
-		try {
-			PackageInfo packageInfo = act.getApplication().getPackageManager().getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
-			int hash = packageInfo.signatures[0].hashCode();
-			if (hash == DEBUG_SIGNATURE_HASH) {
-				return true;
-			}
-		} catch (NameNotFoundException e) {
-		}
-		return false;
 	}
 
 
