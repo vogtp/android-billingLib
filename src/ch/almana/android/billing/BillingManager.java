@@ -11,6 +11,7 @@ import ch.almana.android.billing.backend.PurchaseObserver;
 import ch.almana.android.billing.backend.ResponseHandler;
 import ch.almana.android.billing.cache.DatabasePurchaseObserver;
 import ch.almana.android.billing.cache.ProductCache;
+import ch.almana.android.billing.products.Product;
 import ch.almana.android.util.Debug;
 
 public class BillingManager {

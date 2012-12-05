@@ -25,8 +25,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import ch.almana.android.billing.Product;
 import ch.almana.android.billing.backend.Consts.PurchaseState;
+import ch.almana.android.billing.products.Product;
 
 /**
  * An example database that records the state of each purchase. You should use
