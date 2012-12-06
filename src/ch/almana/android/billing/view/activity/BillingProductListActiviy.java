@@ -19,11 +19,10 @@ import ch.almana.android.billing.view.adapter.BillingProductAdaper;
 
 public class BillingProductListActiviy extends ListActivity implements PurchaseListener {
 
-	
 	public static final String EXTRA_TITLE = "EXTRA_TITLE";
 	public static final String EXTRA_PRODUCT_LIST_ID = "EXTRA_PRODUCT_LIST_ID";
 	private BillingManager bm;
-	private BillingProductAdaper billingProductAdaper;
+	private BillingProductAdaper productAdaper;
 	private int productListId;
 	private ProductManager productManager;
 
@@ -49,13 +48,19 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 	 * Refresh product status in app overwrite
 	 */
 	protected void reinitaliseOwnedItems() {
+		Product[] products = productManager.getProducts(productListId);
+		for (int i = 0; i < products.length; i++) {
+			Product product = products[i];
+			int count = bm.getCountOfProduct(product.getProductId());
+			product.setCount(count);
+			productManager.notifyProductChanged(product);
+		}
 
 	}
 
 	private void updateView() {
-		productManager = ProductManager.getInstance();
-		billingProductAdaper = new BillingProductAdaper(this, productManager.getProductList(productListId).getProducts());
-		getListView().setAdapter(billingProductAdaper);
+		productAdaper = new BillingProductAdaper(this, productManager.getProducts(productListId));
+		getListView().setAdapter(productAdaper);
 
 	}
 
@@ -75,7 +80,7 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Product product = (Product) billingProductAdaper.getItem(position);
+		Product product = (Product) productAdaper.getItem(position);
 		if (!product.isManaged() || product.getCount() < 1) {
 			try {
 				bm.requestPurchase(product.getProductId());
@@ -85,6 +90,7 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 		}
 		if (product.isManaged() && product.getCount() > 0) {
 			configureManagedProduct(product);
+			productManager.notifyProductChanged(product);
 		}
 		super.onListItemClick(l, v, position, id);
 	}
@@ -99,7 +105,8 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 	@Override
 	public void purchaseChanged(String pid, int count) {
 		updateView();
-
+		productManager.purchaseChanged(productListId, pid, count);
+		productAdaper.notifyDataSetChanged();
 	}
 
 	@Override
@@ -130,7 +137,6 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 		bm.restoreTransactionsFromMarket();
 		reinitaliseOwnedItems();
 	}
-
 
 	public static Intent getIntent(Context ctx, Class<? extends BillingProductListActiviy> clazz, CharSequence title, int productListId) {
 		Intent i = new Intent(ctx, clazz);

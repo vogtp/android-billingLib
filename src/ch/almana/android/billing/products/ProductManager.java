@@ -33,6 +33,10 @@ public class ProductManager {
 		return productList.get(listid) != null;
 	}
 
+	public Product[] getProducts(int listid) {
+		return getProductList(listid).getProducts();
+	}
+
 	public ProductList getProductList(int listid) {
 		if (!hasProductList(listid)) {
 			throw new NoSuchProductListException(listid);
@@ -52,6 +56,24 @@ public class ProductManager {
 			addProductList(listid);
 		}
 		productList.put(listid, products);
+	}
+
+
+	public void notifyProductChanged(Product product) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void purchaseChanged(int listid, String pid, int count) {
+		if (pid == null) {
+			return;
+		}
+		Product[] products = getProducts(listid);
+		for (int i = 0; i < products.length; i++) {
+			if (pid.equals(products[i].getProductId())) {
+				products[i].setCount(count);
+			}
+		}
 	}
 
 }
