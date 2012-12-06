@@ -22,13 +22,6 @@
 
         <activity android:name=".view.activity.BillingProductListActiviy" >
         </activity>
-
-        <provider
-            android:name=".db.DBProvider"
-            android:authorities="ch.almana.android.products"
-            android:exported="false"
-            android:grantUriPermissions="true" >
-        </provider>
     </application>
 
 </manifest>
