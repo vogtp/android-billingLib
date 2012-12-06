@@ -25,6 +25,7 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 	private BillingProductAdaper productAdaper;
 	private int productListId;
 	private ProductManager productManager;
+	private boolean billingInProgress = false;;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -40,7 +41,6 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 
 		productManager = ProductManager.getInstance(this);
 		bm = new BillingManager(this);
-		bm.addPurchaseListener(this);
 		updateView();
 	}
 
@@ -83,6 +83,7 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 		Product product = (Product) productAdaper.getItem(position);
 		if (!product.isManaged() || product.getCount() < 1) {
 			try {
+				billingInProgress = true;
 				bm.requestPurchase(product.getProductId());
 			} catch (Throwable e) {
 				Logger.w("Error requesting purchase", e);
@@ -103,10 +104,20 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 	}
 
 	@Override
+	public void onBackPressed() {
+		if (billingInProgress) {
+			Toast.makeText(this, R.string.msg_billing_in_progress, Toast.LENGTH_LONG).show();
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
 	public void purchaseChanged(String pid, int count) {
 		updateView();
 		productManager.purchaseChanged(productListId, pid, count);
 		productAdaper.notifyDataSetChanged();
+		billingInProgress = false;
 	}
 
 	@Override
