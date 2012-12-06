@@ -1,6 +1,10 @@
 package ch.almana.android.billing.products;
 
+import java.util.Map;
+
+import android.content.Context;
 import android.util.SparseArray;
+import ch.almana.android.billing.cache.ProductCache;
 import ch.almana.android.billing.products.exception.NoSuchProductListException;
 import ch.almana.android.billing.products.exception.ProductListExistsException;
 
@@ -8,18 +12,24 @@ public class ProductManager {
 
 	private final SparseArray<ProductList> productList;
 
+	private final Context ctx;
+
+	private final ProductCache productCache;
+
 	private static ProductManager instance;
 
-	public static final ProductManager getInstance() {
+	public static final ProductManager getInstance(Context ctx) {
 		if (instance == null) {
-			instance = new ProductManager();
+			instance = new ProductManager(ctx);
 		}
 		return instance;
 	}
 
-	public ProductManager() {
+	public ProductManager(Context ctx) {
 		super();
+		this.ctx = ctx.getApplicationContext();
 		productList = new SparseArray<ProductList>();
+		productCache = new ProductCache(this.ctx);
 	}
 
 	public void addProductList(int listid) {
@@ -51,13 +61,19 @@ public class ProductManager {
 		productList.put(listid, new ProductList());
 	}
 
-	public void addProducts(int listid, ProductList products) {
+	public void addProducts(int listid, ProductList pl) {
 		if (!hasProductList(listid)) {
 			addProductList(listid);
 		}
-		productList.put(listid, products);
+		Product[] ps = pl.getProducts();
+		Map<String, Product> ownedItems = productCache.getOwnedItems();
+		for (int i = 0; i < ps.length; i++) {
+			if (ownedItems.containsKey(ps[i].getProductId())) {	
+				ps[i].setCount(ownedItems.get(ps[i].getProductId()).getCount());
+			}
+		}
+		productList.put(listid, pl);
 	}
-
 
 	public void notifyProductChanged(Product product) {
 		// TODO Auto-generated method stub

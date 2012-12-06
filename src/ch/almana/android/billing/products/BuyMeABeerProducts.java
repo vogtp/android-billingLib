@@ -1,8 +1,8 @@
 package ch.almana.android.billing.products;
 
 import android.content.Context;
-import ch.almana.android.billing.backend.BillingManager.Managed;
 import ch.almana.android.billing.R;
+import ch.almana.android.billing.backend.BillingManager.Managed;
 
 public class BuyMeABeerProducts {
 
@@ -14,7 +14,7 @@ public class BuyMeABeerProducts {
 	public static void initProducts(Context ctx) {
 		if (!initialised) {
 			initialised = true;
-			productManager = ProductManager.getInstance();
+			productManager = ProductManager.getInstance(ctx);
 			inititaliseProductLists(ctx);
 		}
 	}

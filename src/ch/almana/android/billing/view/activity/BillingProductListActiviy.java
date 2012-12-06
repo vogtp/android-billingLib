@@ -38,7 +38,7 @@ public class BillingProductListActiviy extends ListActivity implements PurchaseL
 
 		productListId = getIntent().getIntExtra(EXTRA_PRODUCT_LIST_ID, -1);
 
-		productManager = ProductManager.getInstance();
+		productManager = ProductManager.getInstance(this);
 		bm = new BillingManager(this);
 		bm.addPurchaseListener(this);
 		updateView();
