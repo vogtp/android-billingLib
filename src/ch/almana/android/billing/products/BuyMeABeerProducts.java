@@ -1,7 +1,7 @@
 package ch.almana.android.billing.products;
 
 import android.content.Context;
-import ch.almana.android.billing.BillingManager.Managed;
+import ch.almana.android.billing.backend.BillingManager.Managed;
 import ch.almana.android.billing.R;
 
 public class BuyMeABeerProducts {

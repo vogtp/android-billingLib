@@ -1,4 +1,4 @@
-package ch.almana.android.billing;
+package ch.almana.android.billing.backend;
 
 public interface PurchaseListener {
 

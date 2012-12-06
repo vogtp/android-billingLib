@@ -1,14 +1,11 @@
-package ch.almana.android.billing;
+package ch.almana.android.billing.backend;
 
 import java.util.Map;
 
 import android.app.Activity;
 import android.os.Handler;
 import android.widget.Toast;
-import ch.almana.android.billing.backend.BillingService;
 import ch.almana.android.billing.backend.Consts.PurchaseState;
-import ch.almana.android.billing.backend.PurchaseObserver;
-import ch.almana.android.billing.backend.ResponseHandler;
 import ch.almana.android.billing.cache.DatabasePurchaseObserver;
 import ch.almana.android.billing.cache.ProductCache;
 import ch.almana.android.billing.products.Product;

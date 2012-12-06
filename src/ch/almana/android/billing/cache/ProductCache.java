@@ -6,8 +6,8 @@ import java.util.Set;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import ch.almana.android.billing.PurchaseListener;
 import ch.almana.android.billing.backend.BillingService;
+import ch.almana.android.billing.backend.PurchaseListener;
 import ch.almana.android.billing.backend.Consts.PurchaseState;
 import ch.almana.android.billing.products.Product;
 

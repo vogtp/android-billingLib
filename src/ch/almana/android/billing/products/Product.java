@@ -2,8 +2,8 @@ package ch.almana.android.billing.products;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import ch.almana.android.billing.BillingManager;
-import ch.almana.android.billing.BillingManager.Managed;
+import ch.almana.android.billing.backend.BillingManager;
+import ch.almana.android.billing.backend.BillingManager.Managed;
 
 public class Product implements Comparable<Object>, Parcelable {
 
