@@ -12,15 +12,15 @@ public class BuyMeABeerProductsInitialiser {
 	private boolean initialised = false;
 	protected ProductManager productManager;
 
-	public void initProducts(Context ctx) {
+	public void loadProductsIfNotLoaded(Context ctx) {
 		if (!initialised) {
 			initialised = true;
 			productManager = ProductManager.getInstance(ctx);
-			inititaliseProductLists(ctx);
+			addProductListsToManager(ctx);
 		}
 	}
 
-	protected void inititaliseProductLists(Context ctx) {
+	protected void addProductListsToManager(Context ctx) {
 		productManager.addProducts(PRODUCTS_BUYMEABEER, getBuyMeABeerProducts(ctx));
 	}
 
