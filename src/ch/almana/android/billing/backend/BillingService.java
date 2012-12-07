@@ -345,13 +345,15 @@ public class BillingService extends Service implements ServiceConnection {
         super();
     }
 
+	public BillingService(Context context) {
+		super();
+		setContext(context);
+	}
+
     public void setContext(Context context) {
         attachBaseContext(context);
     }
 
-    /**
-     * We don't support binding to this service, only starting the service.
-     */
     @Override
     public IBinder onBind(Intent intent) {
         return null;
