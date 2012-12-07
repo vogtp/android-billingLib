@@ -7,8 +7,8 @@ import java.util.Set;
 import android.content.Context;
 import android.content.SharedPreferences;
 import ch.almana.android.billing.backend.BillingService;
-import ch.almana.android.billing.backend.PurchaseListener;
 import ch.almana.android.billing.backend.Consts.PurchaseState;
+import ch.almana.android.billing.backend.PurchaseListener;
 import ch.almana.android.billing.products.Product;
 
 public class ProductCache {
@@ -29,7 +29,6 @@ public class ProductCache {
 
 	SharedPreferences getPreferences() {
 		return ctx.getSharedPreferences(PREF_STORE_LOCAL, 0);
-		//		return PreferenceManager.getDefaultSharedPreferences(ctx);
 	}
 
 	/**

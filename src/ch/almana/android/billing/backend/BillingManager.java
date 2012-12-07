@@ -122,8 +122,4 @@ public class BillingManager {
 		productCache.removePurchaseListener(listener);
 	}
 
-	public boolean hasPurchaseListener() {
-		return productCache.hasPurchaseListener();
-	}
-
 }
