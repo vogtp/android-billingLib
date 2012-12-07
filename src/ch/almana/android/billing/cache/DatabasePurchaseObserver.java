@@ -1,6 +1,6 @@
 package ch.almana.android.billing.cache;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 import ch.almana.android.billing.backend.BillingService.RequestPurchase;
@@ -14,8 +14,8 @@ public class DatabasePurchaseObserver extends PurchaseObserver {
 	private final static String TAG = "Billing";
 	private final ProductCache productCache;
 
-	public DatabasePurchaseObserver(Activity activity, Handler handler, ProductCache productCache) {
-		super(activity, handler);
+	public DatabasePurchaseObserver(Context ctx, Handler handler, ProductCache productCache) {
+		super(ctx, handler);
 		this.productCache = productCache;
 	}
 
@@ -44,11 +44,6 @@ public class DatabasePurchaseObserver extends PurchaseObserver {
 			if (Consts.DEBUG) {
 				Log.d(TAG, "completed RestoreTransactions request");
 			}
-			// Update the shared preferences so that we don't perform
-			// a RestoreTransactions again.
-			//						SharedPreferences.Editor edit = getPreferences().edit();
-			//						edit.putBoolean(DB_INITIALIZED, true);
-			//						edit.commit();
 			productCache.setInitalised();
 		} else {
 			if (Consts.DEBUG) {

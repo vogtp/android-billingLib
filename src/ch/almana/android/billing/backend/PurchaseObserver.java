@@ -5,7 +5,6 @@ package ch.almana.android.billing.backend;
 
 import java.lang.reflect.Method;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Context;
@@ -28,16 +27,16 @@ import ch.almana.android.billing.backend.Consts.ResponseCode;
  */
 public abstract class PurchaseObserver {
 	private final static String TAG = "Billing";
-	private final Activity activity;
+	private final Context context;
     private final Handler mHandler;
     private Method mStartIntentSender;
-    private Object[] mStartIntentSenderArgs = new Object[5];
+	//    private final Object[] mStartIntentSenderArgs = new Object[5];
     private static final Class[] START_INTENT_SENDER_SIG = new Class[] {
         IntentSender.class, Intent.class, int.class, int.class, int.class
     };
 
-	public PurchaseObserver(Activity activity, Handler handler) {
-		this.activity = activity;
+	public PurchaseObserver(Context context, Handler handler) {
+		this.context = context;
         mHandler = handler;
         initCompatibilityLayer();
     }
@@ -104,7 +103,7 @@ public abstract class PurchaseObserver {
 
     private void initCompatibilityLayer() {
         try {
-			mStartIntentSender = activity.getClass().getMethod("startIntentSender",
+			mStartIntentSender = context.getClass().getMethod("startIntentSender",
                     START_INTENT_SENDER_SIG);
         } catch (SecurityException e) {
             mStartIntentSender = null;
@@ -119,7 +118,7 @@ public abstract class PurchaseObserver {
             // must be on the activity stack of the application.
             try {
                 // This implements the method call:
-				activity.startIntentSender(pendingIntent.getIntentSender(), intent, 0, 0, 0);
+				context.startIntentSender(pendingIntent.getIntentSender(), intent, 0, 0, 0);
 				// mStartIntentSenderArgs[0] = pendingIntent.getIntentSender();
 				// mStartIntentSenderArgs[1] = intent;
 				// mStartIntentSenderArgs[2] = Integer.valueOf(0);
@@ -134,7 +133,7 @@ public abstract class PurchaseObserver {
             // own separate activity stack instead of on the activity stack of
             // the application.
             try {
-				pendingIntent.send(activity, 0 /* code */, intent);
+				pendingIntent.send(context, 0 /* code */, intent);
             } catch (CanceledException e) {
                 Log.e(TAG, "error starting activity", e);
             }
@@ -151,7 +150,8 @@ public abstract class PurchaseObserver {
      */
 	void postPurchaseStateChange(final PurchaseState purchaseState, final String itemId, final long purchaseTime, final String developerPayload) {
         mHandler.post(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
 				onPurchaseStateChange(purchaseState, itemId, purchaseTime, developerPayload);
             }
         });

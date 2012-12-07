@@ -2,7 +2,7 @@ package ch.almana.android.billing.backend;
 
 import java.util.Map;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.widget.Toast;
 import ch.almana.android.billing.backend.Consts.PurchaseState;
@@ -13,34 +13,46 @@ import ch.almana.android.util.Debug;
 
 public class BillingManager {
 
-	/** An array of product list entries for the products that can be purchased. */
 	public enum Managed {
 		MANAGED, UNMANAGED
 	}
 
-	private final BillingService mBillingService;
-	private final ProductCache productCache;
+	private BillingService mBillingService;
+	private ProductCache productCache;
 	private final Handler mHandler;
 	private DatabasePurchaseObserver databasePurchaseObserver;
-	private final Activity act;
+	private final Context ctx;
+	private boolean started = false;
 
-	public BillingManager(Activity act) {
+	public BillingManager(Context ctx) {
 		super();
 		mHandler = new Handler();
-		this.act = act;
-		mBillingService = new BillingService();
-		mBillingService.setContext(act.getApplicationContext());
+		this.ctx = ctx;
+		mBillingService = new BillingService(ctx);
 
-		productCache = new ProductCache(act.getApplicationContext());
+		productCache = new ProductCache(ctx);
 		productCache.restoreDatabase(mBillingService, false);
 		checkBillingSupported();
 		registerReceiver();
+		started = true;
+	}
+
+	public boolean reqister() {
+		if (!started) {
+			mBillingService = new BillingService(ctx);
+			productCache = new ProductCache(ctx);
+			registerReceiver();
+			started = true;
+			return true;
+		}
+		return false;
 	}
 
 	public void release() {
 		unregisterReceiver();
 		productCache.finish();
 		mBillingService.stopSelf();
+		started = false;
 	}
 
 	@Override
@@ -74,10 +86,10 @@ public class BillingManager {
 	}
 
 	public boolean requestPurchase(String mSku) {
-		if (Debug.isUnsinedPackage(act)) {
+		if (Debug.isUnsinedPackage(ctx)) {
 			productCache.setInitalised();
 			productCache.purchasedItem(mSku, PurchaseState.PURCHASED, System.currentTimeMillis(), "");
-			Toast.makeText(act, "Dummy purchase!", Toast.LENGTH_LONG).show();
+			Toast.makeText(ctx, "Dummy purchase!", Toast.LENGTH_LONG).show();
 			return true;
 		}
 		return mBillingService.requestPurchase(mSku, null);
@@ -90,7 +102,7 @@ public class BillingManager {
 
 	private void registerReceiver() {
 		if (databasePurchaseObserver == null) {
-			databasePurchaseObserver = new DatabasePurchaseObserver(act, mHandler, productCache);
+			databasePurchaseObserver = new DatabasePurchaseObserver(ctx, mHandler, productCache);
 			ResponseHandler.register(databasePurchaseObserver);
 		}
 	}
@@ -108,6 +120,10 @@ public class BillingManager {
 
 	public void removePurchaseListener(PurchaseListener listener) {
 		productCache.removePurchaseListener(listener);
+	}
+
+	public boolean hasPurchaseListener() {
+		return productCache.hasPurchaseListener();
 	}
 
 }
