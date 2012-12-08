@@ -14,7 +14,15 @@ import ch.almana.android.billing.products.ProductList;
 import ch.almana.android.billing.products.exception.NoSuchProductListException;
 import ch.almana.android.billing.products.exception.ProductListExistsException;
 
-public class ProductManager implements PurchaseListener {
+/**
+ * The ProductManager is the main Entry point for Billing<br/>
+ * 
+ * It handles products and billing
+ * 
+ * @author vogtp
+ * 
+ */
+public class ProductManager {
 
 	private static Set<PurchaseListener> productListeners = new HashSet<PurchaseListener>();
 	private final HashMap<Integer, ProductList> productList;
@@ -24,7 +32,44 @@ public class ProductManager implements PurchaseListener {
 	private int billingInProgress = 0;
 
 	private static ProductManager instance;
+	private final ProductManagerPurchaseListener purchaseListener;
 
+	private class ProductManagerPurchaseListener implements PurchaseListener {
+
+		@Override
+		public void purchaseChanged(String pid, int count) {
+			billingInProgress--;
+			if (pid == null) {
+				return;
+			}
+			for (Integer listid : productList.keySet()) {
+				Product[] products = getProducts(listid);
+				for (int i = 0; i < products.length; i++) {
+					if (pid.equals(products[i].getProductId())) {
+						products[i].setCount(count);
+					}
+				}
+			}
+			if (!(billingInProgress > 0 || productListeners.size() > 0)) {
+				bm.release();
+			}
+			firePurchasedChanged(pid, count);
+		}
+
+		@Override
+		public void billingSupported(boolean supported) {
+			fireBillingSupported(supported);
+		}
+
+	}
+
+	/**
+	 * Get singelton instance of the ProductManager
+	 * 
+	 * @param ctx
+	 *            Context to getApplicationContext() from
+	 * @return The {@link ProductManager}
+	 */
 	public static final ProductManager getInstance(Context ctx) {
 		if (instance == null) {
 			instance = new ProductManager(ctx.getApplicationContext());
@@ -36,9 +81,19 @@ public class ProductManager implements PurchaseListener {
 		super();
 		this.productList = new HashMap<Integer, ProductList>();
 		this.bm = new BillingManager(ctx);
-		bm.addPurchaseListener(this);
+		purchaseListener = new ProductManagerPurchaseListener();
+		bm.addPurchaseListener(purchaseListener);
 	}
 
+	/**
+	 * Adds a new empty {@link ProductList}
+	 * 
+	 * @param listid
+	 *            The unique id of the list
+	 * 
+	 * @throws ProductListExistsException
+	 *             if the list id already exists
+	 */
 	public void addProductList(int listid) {
 		if (hasProductList(listid)) {
 			throw new ProductListExistsException(listid);
@@ -46,14 +101,35 @@ public class ProductManager implements PurchaseListener {
 		productList.put(listid, new ProductList());
 	}
 
+	/**
+	 * Check if the list id exists
+	 * @param listid The unique id of the list
+	 * @return <code>true</code> if the list id has already been added <code>false</code>
+	 */
 	public boolean hasProductList(int listid) {
 		return productList.get(listid) != null;
 	}
 
+	/**
+	 * Get the {@link Product} array of the {@link ProductList}
+	 * 
+	 * @param listid
+	 *            The unique id of the list
+	 * @return the {@link Product} array cannot be <code>null</code>
+	 */
 	public Product[] getProducts(int listid) {
 		return getProductList(listid).getProducts();
 	}
 
+	/**
+	 * Get a {@link ProductList}
+	 * 
+	 * @param listid
+	 *            The unique id of the list
+	 * @return the {@link ProductList} cannot be <code>null</code>
+	 * @throws ProductListExistsException
+	 *             if the list id already exists
+	 */
 	public ProductList getProductList(int listid) {
 		if (!hasProductList(listid)) {
 			throw new NoSuchProductListException(listid);
@@ -61,6 +137,16 @@ public class ProductManager implements PurchaseListener {
 		return productList.get(listid);
 	}
 
+	/**
+	 * Add a single {@link Product} to the {@link ProductList}
+	 * 
+	 * @param listid
+	 *            The unique id of the list
+	 * @param product
+	 *            the {@link Product} to be added
+	 * @throws ProductListExistsException
+	 *             if the list id already exists
+	 */
 	public void addProduct(int listid, Product product) {
 		if (!hasProductList(listid)) {
 			throw new NoSuchProductListException(listid);
@@ -68,6 +154,16 @@ public class ProductManager implements PurchaseListener {
 		productList.put(listid, new ProductList());
 	}
 
+	/**
+	 * Add a array {@link Product}s to the {@link ProductList}
+	 * 
+	 * @param listid
+	 *            The unique id of the list
+	 * @param product
+	 *            the {@link Product} to be added
+	 * @throws ProductListExistsException
+	 *             if the list id already exists
+	 */
 	public void addProducts(int listid, ProductList pl) {
 		if (!hasProductList(listid)) {
 			addProductList(listid);
@@ -82,39 +178,32 @@ public class ProductManager implements PurchaseListener {
 		productList.put(listid, pl);
 	}
 
-	@Override
-	public void purchaseChanged(String pid, int count) {
-		billingInProgress--;
-		if (pid == null) {
-			return;
-		}
-		for (Integer listid : productList.keySet()) {
-			Product[] products = getProducts(listid);
-			for (int i = 0; i < products.length; i++) {
-				if (pid.equals(products[i].getProductId())) {
-					products[i].setCount(count);
-				}
-			}
-		}
-		firePurchasedChanged(pid, count);
-	}
 
-	@Override
-	public void billingSupported(boolean supported) {
-		fireBillingSupported(supported);
-	}
-
+	/**
+	 * Add a listener to {@link PurchaseListener} events<br>
+	 * Starts background market services if needed
+	 * 
+	 * @param listener
+	 *            {@link PurchaseListener} to add
+	 */
 	public void addPurchaseListener(PurchaseListener listener) {
-		if (listener == this) {
+		if (listener == purchaseListener) {
 			return;
 		}
 		if (bm.reqister()) {
 			// bm has been released bevore, readd us
-			bm.addPurchaseListener(this);
+			bm.addPurchaseListener(purchaseListener);
 		}
 		productListeners.add(listener);
 	}
 
+	/**
+	 * Remove listener from {@link PurchaseListener} events<br>
+	 * If needed and no purchase if in progress stop background market services
+	 * 
+	 * @param listener
+	 *            {@link PurchaseListener} to remove
+	 */
 	public void removePurchaseListener(PurchaseListener listener) {
 		productListeners.remove(listener);
 		if (!(billingInProgress > 0 || productListeners.size() > 0)) {
@@ -123,7 +212,7 @@ public class ProductManager implements PurchaseListener {
 	}
 
 	/**
-	 * Refresh product status in app overwrite
+	 * Refresh product status from app overwrite FIXME does not work like this
 	 */
 	protected void reinitaliseOwnedItems() {
 		for (Integer listid : productList.keySet()) {
@@ -137,6 +226,12 @@ public class ProductManager implements PurchaseListener {
 		}
 	}
 
+	/**
+	 * Request the {@link Product} to be bought
+	 * 
+	 * @param product
+	 *            the {@link Product} to be bought
+	 */
 	public void requestPurchase(Product product) {
 		if (!product.isManaged() || product.getCount() < 1) {
 			try {
@@ -152,12 +247,16 @@ public class ProductManager implements PurchaseListener {
 		}
 	}
 
+	/**
+	 * Restore the status (e.g. amount bought) from the product from the network
+	 * service
+	 */
 	public void restoreTransactionsFromMarket() {
 		bm.restoreTransactionsFromMarket();
 		reinitaliseOwnedItems();
 	}
 
-	public void fireBillingSupported(boolean supported) {
+	protected void fireBillingSupported(boolean supported) {
 		for (PurchaseListener listener : productListeners) {
 			listener.billingSupported(supported);
 		}
