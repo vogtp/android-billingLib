@@ -26,7 +26,7 @@ public class BuyMeABeerProductsInitialiser {
 
 	private ProductList getBuyMeABeerProducts(Context ctx) {
 		ProductList beer = new ProductList(new Product("kids.cookie", ctx.getString(R.string.name_buy_cookie), ctx.getString(R.string.desc_buy_cookie), Managed.UNMANAGED),
-				new Product("bar.beer", ctx.getString(R.string.name_buy_me_a_beer), ctx.getString(R.string.desc_buy_beer), Managed.UNMANAGED));
+				new Product("bar_beer", ctx.getString(R.string.name_buy_me_a_beer), ctx.getString(R.string.desc_buy_beer), Managed.UNMANAGED));
 		beer.add(new Product("bar.whiskey", ctx.getString(R.string.name_buy_me_a_whiskey), ctx.getString(R.string.desc_buy_whiskey), Managed.UNMANAGED));
 		beer.add(new Product("kids.toys", ctx.getString(R.string.name_buy_toy), ctx.getString(R.string.desc_buy_toy), Managed.UNMANAGED));
 		return beer;
